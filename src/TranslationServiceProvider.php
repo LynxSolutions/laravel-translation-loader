@@ -44,10 +44,26 @@ class TranslationServiceProvider extends IlluminateTranslationServiceProvider
      */
     protected function registerLoader()
     {
+        try { 
+            Illuminate\Support\Facades\DB::connection()->getPdo();
+            
+            if (Schema::hasTable('language_lines')) {
+                $this->app->singleton('translation.loader', function ($app) {
+                    $class = config('translation-loader.translation_manager');
+                    return new $class($app['files'], $app['path.lang']);
+                });
+            } else {
+                $this->registerFileLoader();
+            }
+        } catch(\Doctrine\DBAL\Driver\PDOException $e) {
+            $this->registerFileLoader();
+        }
+    }
+    
+    protected function registerFileLoader()
+    {
         $this->app->singleton('translation.loader', function ($app) {
-            $class = config('translation-loader.translation_manager');
-
-            return new $class($app['files'], $app['path.lang']);
+            return new FileLoader($app['files'], $app['path.lang']);
         });
     }
 }
