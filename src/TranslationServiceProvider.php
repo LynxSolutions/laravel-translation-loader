@@ -4,6 +4,8 @@ namespace Spatie\TranslationLoader;
 
 use Illuminate\Translation\FileLoader;
 use Illuminate\Translation\TranslationServiceProvider as IlluminateTranslationServiceProvider;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class TranslationServiceProvider extends IlluminateTranslationServiceProvider
 {
@@ -45,7 +47,7 @@ class TranslationServiceProvider extends IlluminateTranslationServiceProvider
     protected function registerLoader()
     {
         try { 
-            Illuminate\Support\Facades\DB::connection()->getPdo();
+            DB::connection()->getPdo();
             
             if (Schema::hasTable('language_lines')) {
                 $this->app->singleton('translation.loader', function ($app) {
